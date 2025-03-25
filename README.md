@@ -1,4 +1,7 @@
-# ppb_simpple
+# 5025221271_Hardy Tee
+# Link_video : https://drive.google.com/file/d/1hcVw2cMJp2UOY_AUpvcVNXflLvZTLKRo/view?usp=sharing
+
+# ppb_simple application
 
 A new Flutter project.
 
