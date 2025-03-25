@@ -18,6 +18,64 @@ class Post {
   });
 }
 
+class PostCard extends StatelessWidget {
+  final Post post;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+
+  const PostCard({
+    Key? key,
+    required this.post,
+    required this.onEdit,
+    required this.onDelete,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.all(8.0),
+      child: Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              post.title,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 4),
+            // Caption text
+            Text(post.caption),
+            SizedBox(height: 8),
+            Image.network(
+              post.imageUrl,
+              errorBuilder: (context, error, stackTrace) {
+                return Text('Error loading image');
+              },
+            ),
+            OverflowBar(
+              alignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.edit),
+                  onPressed: onEdit,
+                ),
+                IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: onDelete,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -67,8 +125,7 @@ class _PostListPageState extends State<PostListPage> {
     final isEditing = post != null;
     final titleController = TextEditingController(text: post?.title ?? '');
     final captionController = TextEditingController(text: post?.caption ?? '');
-    final imageUrlController =
-    TextEditingController(text: post?.imageUrl ?? '');
+    final imageUrlController = TextEditingController(text: post?.imageUrl ?? '');
 
     showDialog(
       context: context,
@@ -112,15 +169,16 @@ class _PostListPageState extends State<PostListPage> {
                     imageUrl.isNotEmpty) {
                   setState(() {
                     if (isEditing) {
-                      post!.title = title;
+                      post.title = title;
                       post.caption = caption;
                       post.imageUrl = imageUrl;
                     } else {
                       posts.add(Post(
-                          id: _nextId++,
-                          title: title,
-                          caption: caption,
-                          imageUrl: imageUrl));
+                        id: _nextId++,
+                        title: title,
+                        caption: caption,
+                        imageUrl: imageUrl,
+                      ));
                     }
                   });
                   Navigator.of(context).pop();
@@ -149,45 +207,10 @@ class _PostListPageState extends State<PostListPage> {
         itemCount: posts.length,
         itemBuilder: (context, index) {
           final post = posts[index];
-          return Card(
-            margin: EdgeInsets.all(8.0),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    post.title,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 4),
-                  Text(post.caption),
-                  SizedBox(height: 8),
-                  Image.network(
-                    post.imageUrl,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Text('Error loading image');
-                    },
-                  ),
-                  ButtonBar(
-                    alignment: MainAxisAlignment.end,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.edit),
-                        onPressed: () => _addOrEditPost(post: post),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.delete),
-                        onPressed: () => _deletePost(post),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+          return PostCard(
+            post: post,
+            onEdit: () => _addOrEditPost(post: post),
+            onDelete: () => _deletePost(post),
           );
         },
       ),
